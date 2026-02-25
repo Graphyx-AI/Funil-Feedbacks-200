@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funil de Feedbacks — LUMYF Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06080c;
+  --surface: #0d1117;
+  --surface2: #151b24;
+  --surface3: #1c2431;
+  --border: #21293a;
+  --border2: #2d3a4f;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --wa: #22c55e;
+  --wa-bg: rgba(34,197,94,.08);
+  --li: #3b82f6;
+  --li-bg: rgba(59,130,246,.08);
+  --ig: #ec4899;
+  --ig-bg: rgba(236,72,153,.08);
+  --dc: #8b5cf6;
+  --dc-bg: rgba(139,92,246,.08);
+  --fm: #f59e0b;
+  --fm-bg: rgba(245,158,11,.08);
+  --accent: #06b6d4;
+  --accent-bg: rgba(6,182,212,.08);
+  --success: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --radius: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--surface); }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+/* HEADER */
+.hdr { padding:28px 28px 20px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,#0a0f16,var(--bg)); position:sticky; top:0; z-index:100; }
+.hdr-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.hdr h1 { font-size:22px; font-weight:700; letter-spacing:-.3px; }
+.hdr h1 span { color:var(--accent); }
+.hdr-actions { display:flex; gap:8px; }
+.btn { padding:8px 16px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-family:'Outfit',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:6px; }
+.btn:hover { border-color:var(--accent); color:var(--accent); }
+.btn-primary { background:var(--accent); color:#000; border-color:var(--accent); font-weight:600; }
+.btn-primary:hover { opacity:.85; }
+.btn-sm { padding:5px 10px; font-size:11px; }
+
+/* STATS */
+.stats { display:flex; gap:8px; padding:16px 28px; overflow-x:auto; border-bottom:1px solid var(--border); }
+.st { flex-shrink:0; padding:12px 16px; border-radius:var(--radius); border:1px solid var(--border); background:var(--surface); cursor:pointer; transition:all .15s; min-width:100px; }
+.st:hover { border-color:var(--accent); }
+.st.active { border-color:var(--accent); background:var(--accent-bg); }
+.st-n { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; }
+.st-l { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1.2px; margin-top:2px; }
+
+/* FILTERS */
+.filters { display:flex; gap:6px; padding:14px 28px; flex-wrap:wrap; align-items:center; border-bottom:1px solid var(--border); }
+.pill { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text3); font-family:'Outfit',sans-serif; font-size:12px; cursor:pointer; transition:all .15s; }
+.pill:hover { border-color:var(--text2); color:var(--text2); }
+.pill.on { background:var(--accent); color:#000; border-color:var(--accent); font-weight:600; }
+.pill .d { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; }
+.search { margin-left:auto; padding:7px 14px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-family:'Outfit',sans-serif; font-size:12px; outline:none; width:200px; }
+.search:focus { border-color:var(--accent); }
+.search::placeholder { color:var(--text3); }
+.pill-group { display:flex; gap:6px; flex-wrap:wrap; }
+.sep { width:1px; height:24px; background:var(--border); margin:0 6px; flex-shrink:0; }
+.pill-status { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text3); font-family:'Outfit',sans-serif; font-size:12px; cursor:pointer; transition:all .15s; }
+.pill-status:hover { border-color:var(--text2); color:var(--text2); }
+.pill-status.on { background:var(--surface3); color:var(--text); border-color:var(--border2); font-weight:500; }
+
+/* TABLE */
+.tbl-wrap { overflow-x:auto; padding:0 28px 80px; }
+table { width:100%; border-collapse:collapse; margin-top:8px; font-size:13px; }
+thead th { position:sticky; top:0; background:var(--surface); padding:10px 12px; text-align:left; font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.8px; border-bottom:1px solid var(--border); white-space:nowrap; z-index:10; }
+tbody tr { border-bottom:1px solid var(--border); transition:background .1s; cursor:pointer; }
+tbody tr:hover { background:var(--surface2); }
+tbody td { padding:10px 12px; vertical-align:top; max-width:200px; }
+.name-cell { display:flex; align-items:center; gap:8px; }
+.av { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+.nm { font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
+.badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:600; white-space:nowrap; }
+.b-wa { background:var(--wa-bg); color:var(--wa); }
+.b-li { background:var(--li-bg); color:var(--li); }
+.b-ig { background:var(--ig-bg); color:var(--ig); }
+.b-dc { background:var(--dc-bg); color:var(--dc); }
+.b-fm { background:var(--fm-bg); color:var(--fm); }
+.link-btn { padding:4px 10px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--accent); font-size:11px; font-family:'Outfit',sans-serif; cursor:pointer; text-decoration:none; transition:all .15s; white-space:nowrap; }
+.link-btn:hover { background:var(--accent-bg); border-color:var(--accent); }
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+.s-pending { background:var(--text3); }
+.s-contacted { background:var(--warn); }
+.s-replied { background:var(--accent); }
+.s-tested { background:var(--success); }
+.s-feedback { background:#a855f7; }
+.grp-badge { font-size:10px; color:var(--text3); background:rgba(255,255,255,.03); padding:2px 6px; border-radius:6px; white-space:nowrap; }
+.check { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+.ct-mono { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* MODAL */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; backdrop-filter:blur(4px); justify-content:center; align-items:flex-start; padding:40px 20px; overflow-y:auto; }
+.overlay.open { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:14px; width:100%; max-width:680px; overflow:hidden; animation:slideUp .25s ease; }
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.modal-hdr { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-hdr h2 { font-size:18px; font-weight:600; }
+.close-btn { background:none; border:none; color:var(--text3); font-size:20px; cursor:pointer; padding:4px; }
+.close-btn:hover { color:var(--text); }
+.modal-body { padding:24px; max-height:70vh; overflow-y:auto; }
+.field { margin-bottom:18px; }
+.field label { display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+.field label small { font-weight:400; color:var(--text3); text-transform:none; letter-spacing:0; }
+.field textarea, .field input, .field select { width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-family:'Outfit',sans-serif; font-size:13px; outline:none; transition:border-color .15s; }
+.field textarea:focus, .field input:focus, .field select:focus { border-color:var(--accent); }
+.field textarea { resize:vertical; min-height:70px; }
+.field select { cursor:pointer; }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+.info-bar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; padding:14px; background:var(--surface2); border-radius:10px; border:1px solid var(--border); }
+.info-item { font-size:12px; color:var(--text2); }
+.info-item strong { color:var(--text); }
+
+/* RESPONSIVE */
+@media (max-width:768px) {
+  .hdr,.stats,.filters,.tbl-wrap { padding-left:14px; padding-right:14px; }
+  .search { width:100%; margin-left:0; margin-top:6px; }
+  .filters { flex-direction:column; align-items:stretch; }
+  .field-row { grid-template-columns:1fr; }
+  .hdr-top { flex-direction:column; align-items:flex-start; }
+}
+
+.empty { text-align:center; padding:60px 20px; color:var(--text3); }
+.empty span { font-size:40px; display:block; margin-bottom:12px; }
+.progress-bar { height:4px; background:var(--surface3); border-radius:2px; overflow:hidden; width:100%; }
+.progress-fill { height:100%; border-radius:2px; transition:width .3s; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <h1>🎯 Funil de Feedbacks — <span>LUMYF Beta</span></h1>
+    <div class="hdr-actions">
+      <button class="btn" onclick="exportCSV()">📥 Exportar CSV</button>
+      <button class="btn" onclick="resetAll()">🗑️ Resetar</button>
+    </div>
+  </div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="filters">
+  <div class="pill-group" id="channelFilters"></div>
+  <div class="sep"></div>
+  <div class="pill-group" id="statusFilters"></div>
+  <input class="search" type="text" placeholder="🔍 Buscar nome, grupo, contato..." id="searchBox" oninput="renderTable()">
+</div>
+
+<div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Canal</th>
+        <th>Grupo</th>
+        <th>Contato</th>
+        <th>Link</th>
+        <th>Status</th>
+        <th>Respondeu</th>
+        <th>Experiência</th>
+        <th>NPS</th>
+        <th>Progresso</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="empty" id="emptyState" style="display:none">
+    <span>🔍</span>
+    Nenhum contato encontrado com esses filtros.
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="modalTitle">Feedback</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveFeedback()">💾 Salvar Feedback</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// ALL 182 BETA TESTERS DATA
+// ═══════════════════════════════════════════
+const contacts = [
+  // CODECON LADIES (15)
+  {id:1,name:"Alice Reis",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 35 93618-0592",link:"https://wa.me/5535936180592"},
+  {id:2,name:"Contato CL-01",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 41 9782-9812",link:"https://wa.me/554197829812"},
+  {id:3,name:"Contato CL-02",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 41 8817-1687",link:"https://wa.me/554188171687"},
+  {id:4,name:"Contato CL-03",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 47 8821-5610",link:"https://wa.me/554788215610"},
+  {id:5,name:"Contato CL-04",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 48 9151-4197",link:"https://wa.me/554891514197"},
+  {id:6,name:"Contato CL-05",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 41 9254-6414",link:"https://wa.me/554192546414"},
+  {id:7,name:"Contato CL-06",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 41 9156-8570",link:"https://wa.me/554191568570"},
+  {id:8,name:"Contato CL-07",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 21 97181-7313",link:"https://wa.me/5521971817313"},
+  {id:9,name:"Contato CL-08",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 47 9723-8173",link:"https://wa.me/554797238173"},
+  {id:10,name:"Contato CL-09",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 47 9766-6539",link:"https://wa.me/554797666539"},
+  {id:11,name:"Contato CL-10",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 55 9691-3627",link:"https://wa.me/555596913627"},
+  {id:12,name:"Contato CL-11",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 35 8880-1235",link:"https://wa.me/553588801235"},
+  {id:13,name:"Contato CL-12",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 41 9618-2728",link:"https://wa.me/554196182728"},
+  {id:14,name:"Leiliane Cavalcante",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 21 99218-2138",link:"https://wa.me/5521992182138"},
+  {id:15,name:"Contato CL-13",ch:"WhatsApp",grp:"Codecon Ladies",ct:"+55 71 9338-1653",link:"https://wa.me/557193381653"},
+  // MULHERES ESTÁCIO (15)
+  {id:16,name:"Contato ME-01",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 21 96930-6454",link:"https://wa.me/5521969306454"},
+  {id:17,name:"Contato ME-02",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 31 9709-0001",link:"https://wa.me/553197090001"},
+  {id:18,name:"Contato ME-03",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 21 97940-7019",link:"https://wa.me/5521979407019"},
+  {id:19,name:"Contato ME-04",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 71 8687-5571",link:"https://wa.me/557186875571"},
+  {id:20,name:"Contato ME-05",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 21 97985-8378",link:"https://wa.me/5521979858378"},
+  {id:21,name:"Contato ME-06",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 19 99404-6025",link:"https://wa.me/5519994046025"},
+  {id:22,name:"Contato ME-07",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 73 8815-7665",link:"https://wa.me/557388157665"},
+  {id:23,name:"Contato ME-08",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 31 9515-6551",link:"https://wa.me/553195156551"},
+  {id:24,name:"Contato ME-09",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 47 9167-3486",link:"https://wa.me/554791673486"},
+  {id:25,name:"Contato ME-10",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 82 8849-8633",link:"https://wa.me/558288498633"},
+  {id:26,name:"Contato ME-11",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 79 9824-5706",link:"https://wa.me/557998245706"},
+  {id:27,name:"Contato ME-12",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 21 97453-7619",link:"https://wa.me/5521974537619"},
+  {id:28,name:"Contato ME-13",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 79 9907-2175",link:"https://wa.me/557999072175"},
+  {id:29,name:"Contato ME-14",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 91 8131-4102",link:"https://wa.me/559181314102"},
+  {id:30,name:"Contato ME-15",ch:"WhatsApp",grp:"Mulheres Estácio",ct:"+55 73 8815-7865",link:"https://wa.me/557388157865"},
+  // DESAFIO DA VEZ (36)
+  {id:31,name:"Contato DV-01",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 62 9212-4075",link:"https://wa.me/556292124075"},
+  {id:32,name:"Contato DV-02",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 41 9850-7530",link:"https://wa.me/554198507530"},
+  {id:33,name:"Contato DV-03",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 61 9944-1378",link:"https://wa.me/556199441378"},
+  {id:34,name:"Glaucionne Vasconcelos",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 92 9155-2086",link:"https://wa.me/559291552086"},
+  {id:35,name:"Contato DV-04",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 19 99924-1135",link:"https://wa.me/5519999241135"},
+  {id:36,name:"Contato DV-05",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 61 8550-5482",link:"https://wa.me/556185505482"},
+  {id:37,name:"Contato DV-06",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 67 8472-7499",link:"https://wa.me/556784727499"},
+  {id:38,name:"Contato DV-07",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 88 9464-8572",link:"https://wa.me/558894648572"},
+  {id:39,name:"Contato DV-08",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 12 99240-1311",link:"https://wa.me/5512992401311"},
+  {id:40,name:"Tânia",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 97114-8627",link:"https://wa.me/5511971148627"},
+  {id:41,name:"Gilcimara Valentim",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 12 99620-9301",link:"https://wa.me/5512996209301"},
+  {id:42,name:"Contato DV-09",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 49 9995-0503",link:"https://wa.me/554999950503"},
+  {id:43,name:"Contato DV-10",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 19 99347-8105",link:"https://wa.me/5519993478105"},
+  {id:44,name:"Contato DV-11",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 37 9952-5373",link:"https://wa.me/553799525373"},
+  {id:45,name:"Contato DV-12",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 79 9843-6365",link:"https://wa.me/557998436365"},
+  {id:46,name:"Contato DV-13",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 81 9676-5330",link:"https://wa.me/558196765330"},
+  {id:47,name:"Contato DV-14",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 98769-4947",link:"https://wa.me/5511987694947"},
+  {id:48,name:"Contato DV-15",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 99399-4449",link:"https://wa.me/5511993994449"},
+  {id:49,name:"Contato DV-16",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 24 99219-8631",link:"https://wa.me/5524992198631"},
+  {id:50,name:"Contato DV-17",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 51 8199-3273",link:"https://wa.me/555181993273"},
+  {id:51,name:"Keitlyn Katsuka",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 14 98770-4780",link:"https://wa.me/5514987704780"},
+  {id:52,name:"Contato DV-18",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 21 97238-8905",link:"https://wa.me/5521972388905"},
+  {id:53,name:"Contato DV-19",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 44 9936-4198",link:"https://wa.me/554499364198"},
+  {id:54,name:"Contato DV-20",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 98967-1460",link:"https://wa.me/5511989671460"},
+  {id:55,name:"Contato DV-21",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 96792-1094",link:"https://wa.me/5511967921094"},
+  {id:56,name:"Contato DV-22",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+44 7752 199118",link:"https://wa.me/447752199118"},
+  {id:57,name:"Contato DV-23",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 96854-0074",link:"https://wa.me/5511968540074"},
+  {id:58,name:"Contato DV-24",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 79 8152-2948",link:"https://wa.me/557981522948"},
+  {id:59,name:"Contato DV-25",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+40 798 925162",link:"https://wa.me/40798925162"},
+  {id:60,name:"Contato DV-26",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 31 1211-0049",link:"https://wa.me/553112110049"},
+  {id:61,name:"Contato DV-27",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 91671-6294",link:"https://wa.me/5511916716294"},
+  {id:62,name:"Contato DV-28",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 98622-1167",link:"https://wa.me/5511986221167"},
+  {id:63,name:"Contato DV-29",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 22 98143-0914",link:"https://wa.me/5522981430914"},
+  {id:64,name:"Contato DV-30",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 21 99605-9141",link:"https://wa.me/5521996059141"},
+  {id:65,name:"Contato DV-31",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 11 96950-8999",link:"https://wa.me/5511969508999"},
+  {id:66,name:"Contato DV-32",ch:"WhatsApp",grp:"Desafio da Vez",ct:"+55 53 8435-2480",link:"https://wa.me/555384352480"},
+  // REAL DEV NETWORK (11)
+  {id:67,name:"Contato RD-01",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 31 8324-6230",link:"https://wa.me/553183246230"},
+  {id:68,name:"Contato RD-02",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 48 9958-3369",link:"https://wa.me/554899583369"},
+  {id:69,name:"Contato RD-03",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 32 9954-8110",link:"https://wa.me/553299548110"},
+  {id:70,name:"Contato RD-04",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 61 9928-7172",link:"https://wa.me/556199287172"},
+  {id:71,name:"Contato RD-05",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 69 9227-0582",link:"https://wa.me/556992270582"},
+  {id:72,name:"Contato RD-06",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 11 94915-9058",link:"https://wa.me/5511949159058"},
+  {id:73,name:"Contato RD-07",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 49 9947-8729",link:"https://wa.me/554999478729"},
+  {id:74,name:"Contato RD-08",ch:"WhatsApp",grp:"Real Dev Network",ct:"+244 925 136 481",link:"https://wa.me/244925136481"},
+  {id:75,name:"Contato RD-09",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 11 97392-9903",link:"https://wa.me/5511973929903"},
+  {id:76,name:"Contato RD-10",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 18 99627-8558",link:"https://wa.me/5518996278558"},
+  {id:77,name:"Contato RD-11",ch:"WhatsApp",grp:"Real Dev Network",ct:"+55 82 8887-3225",link:"https://wa.me/558288873225"},
+  // 1000DEVS (2)
+  {id:78,name:"Vinícius Borges",ch:"WhatsApp",grp:"Iniciantes 1000Devs",ct:"+55 62 9413-5587",link:"https://wa.me/556294135587"},
+  {id:79,name:"Contato 1K-01",ch:"WhatsApp",grp:"Iniciantes 1000Devs",ct:"+55 71 9294-7918",link:"https://wa.me/557192947918"},
+  // CORVOADA UNESA (2)
+  {id:80,name:"João",ch:"WhatsApp",grp:"Corvoada UNESA",ct:"+55 21 98213-3471",link:"https://wa.me/5521982133471"},
+  {id:81,name:"Sis F.a",ch:"WhatsApp",grp:"Corvoada UNESA",ct:"+55 21 96915-0766",link:"https://wa.me/5521969150766"},
+  // ANÁLISE E DEV SISTEMAS (4)
+  {id:82,name:"Acsa Rayane",ch:"WhatsApp",grp:"Análise e Dev Sistemas",ct:"+55 81 9718-5142",link:"https://wa.me/558197185142"},
+  {id:83,name:"Jhully Emilly",ch:"WhatsApp",grp:"Análise e Dev Sistemas",ct:"+55 67 9186-9901",link:"https://wa.me/556791869901"},
+  {id:84,name:"Guilherme Freitas",ch:"WhatsApp",grp:"Análise e Dev Sistemas",ct:"+55 95 9125-6390",link:"https://wa.me/559591256390"},
+  {id:85,name:"Feeh ✌",ch:"WhatsApp",grp:"Análise e Dev Sistemas",ct:"+55 77 9876-3151",link:"https://wa.me/557798763151"},
+  // SQUARD 9 PDA (1)
+  {id:86,name:"Guilherme (L)",ch:"WhatsApp",grp:"Squard 9 PDA",ct:"+55 74 9904-5492",link:"https://wa.me/557499045492"},
+  // DEVOPS ALUNO (3)
+  {id:87,name:"Phillipe Jonson",ch:"WhatsApp",grp:"DevOps Aluno",ct:"+55 83 9383-4958",link:"https://wa.me/558393834958"},
+  {id:88,name:"Juliene",ch:"WhatsApp",grp:"DevOps Aluno",ct:"+55 22 99214-3703",link:"https://wa.me/5522992143703"},
+  {id:89,name:"Flávio 🤘😎",ch:"WhatsApp",grp:"DevOps Aluno",ct:"+55 84 8762-4826",link:"https://wa.me/558487624826"},
+  // DEVOPS ALUNOS 2 (1)
+  {id:90,name:"Jezebel",ch:"WhatsApp",grp:"DevOps Alunos 2",ct:"+55 11 95733-3990",link:"https://wa.me/5511957333990"},
+  // GRUPINHO CODECON (18)
+  {id:91,name:"Maria Vitoria",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 49 9906-0495",link:"https://wa.me/554999060495"},
+  {id:92,name:"Mariana",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 41 9136-8570",link:"https://wa.me/554191368570"},
+  {id:93,name:"Jonathan Schultz",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 27 99957-3375",link:"https://wa.me/5527999573375"},
+  {id:94,name:"Marcos",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 47 9770-0060",link:"https://wa.me/554797700060"},
+  {id:95,name:"Marcucci",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 41 8481-0977",link:"https://wa.me/554184810977"},
+  {id:96,name:"Ivan Sansao",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 47 9918-8299",link:"https://wa.me/554799188299"},
+  {id:97,name:"Bruno Sales",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 61 8142-6320",link:"https://wa.me/556181426320"},
+  {id:98,name:"Felipe Maccari",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 46 9134-4560",link:"https://wa.me/554691344560"},
+  {id:99,name:"Elcorrea",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 92 9340-1874",link:"https://wa.me/559293401874"},
+  {id:100,name:"Andre Ovidio",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 47 9604-7958",link:"https://wa.me/554796047958"},
+  {id:101,name:"Paulo Haus",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 41 93300-6505",link:"https://wa.me/5541933006505"},
+  {id:102,name:"Jefferson S. Caires",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 47 9115-8071",link:"https://wa.me/554791158071"},
+  {id:103,name:"Robson",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 41 8895-1768",link:"https://wa.me/554188951768"},
+  {id:104,name:"Lucas",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 81 8834-7171",link:"https://wa.me/558188347171"},
+  {id:105,name:"Roger Correa",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 41 9921-3102",link:"https://wa.me/554199213102"},
+  {id:106,name:"Tiel",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 11 98818-1616",link:"https://wa.me/5511988181616"},
+  {id:107,name:"Saulo",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 47 9915-8967",link:"https://wa.me/554799158967"},
+  {id:108,name:"Jéssica Isri",ch:"WhatsApp",grp:"Grupinho Codecon",ct:"+55 12 98865-8327",link:"https://wa.me/5512988658327"},
+  // LINKEDIN ÍRIS (13)
+  {id:109,name:"Anderson Nascimento",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Anderson%20Nascimento"},
+  {id:110,name:"Gabriel Machado",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Gabriel%20Machado"},
+  {id:111,name:"Jonas Fernandes",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Jonas%20Fernandes"},
+  {id:112,name:"Raine Rocha",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Raine%20Rocha"},
+  {id:113,name:"Fernanda Oliveira",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Fernanda%20Oliveira"},
+  {id:114,name:"Elesfrankly Delmon",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Elesfrankly%20Delmon"},
+  {id:115,name:"Kayky Santos",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Kayky%20Santos"},
+  {id:116,name:"Lucas Borges",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Lucas%20Borges"},
+  {id:117,name:"Rosário Caravela",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Ros%C3%A1rio%20Caravela"},
+  {id:118,name:"Guilherme Barbosa",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Guilherme%20Barbosa"},
+  {id:119,name:"Felipe Mussi",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Felipe%20Mussi"},
+  {id:120,name:"Maria Rocha",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Maria%20Rocha"},
+  {id:121,name:"Wender Gustavo",ch:"LinkedIn",grp:"LinkedIn Íris",ct:"LinkedIn DM",link:"https://www.linkedin.com/search/results/all/?keywords=Wender%20Gustavo"},
+  // INSTAGRAM @CALIXTO.DEV (23)
+  {id:122,name:"Davidson William",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:123,name:"Savio Sodré Rosa",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:124,name:"Rodrigo Pereira",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:125,name:"Kelvin Almeida",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:126,name:"Kelven Gomes",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:127,name:"Mariana Cristina",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:128,name:"Janilton Francisco",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:129,name:"Melchisedek Lima",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:130,name:"Karolynna Sousa",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:131,name:"Soraia Cunha",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:132,name:"Wellington Lima",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:133,name:"Kelvis Xakriabá",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:134,name:"Caroline dos Santos",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:135,name:"Roberta Lau",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:136,name:"Douglas Adriano",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:137,name:"Mayki Gonçalves",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:138,name:"Miguel Reis Santos",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:139,name:"Natan Lucena",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:140,name:"Juliana Gonçalves",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:141,name:"Paulo Henrique",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:142,name:"Jonas Costa",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:143,name:"Marcus Vinícius",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  {id:144,name:"João Targino",ch:"Instagram",grp:"@calixto.dev",ct:"DM Instagram",link:"https://www.instagram.com/calixto.dev/"},
+  // DISCORD (12)
+  {id:145,name:"Dennis Silva",ch:"Discord",grp:"Discord Votantes",ct:"@dennisdn07",link:"https://discord.com/"},
+  {id:146,name:"Júlio César",ch:"Discord",grp:"Discord Votantes",ct:"@_jullliao",link:"https://discord.com/"},
+  {id:147,name:"Gabriela Barbosa",ch:"Discord",grp:"Discord Votantes",ct:"@gabivitoriax_",link:"https://discord.com/"},
+  {id:148,name:"Keila Silva",ch:"Discord",grp:"Discord Votantes",ct:"@keilasilvaa01",link:"https://discord.com/"},
+  {id:149,name:"Allan Cardoso",ch:"Discord",grp:"Discord Votantes",ct:"@allan_cardoso208",link:"https://discord.com/"},
+  {id:150,name:"Diogo Ferreira",ch:"Discord",grp:"Discord Votantes",ct:"@diogo.dev7",link:"https://discord.com/"},
+  {id:151,name:"Jeferson Alves",ch:"Discord",grp:"Discord Votantes",ct:"@_jef.alves7",link:"https://discord.com/"},
+  {id:152,name:"Fabiano Gomes",ch:"Discord",grp:"Discord Votantes",ct:"@fabianogomes.gom",link:"https://discord.com/"},
+  {id:153,name:"Brandon Gabriel",ch:"Discord",grp:"Discord Votantes",ct:"@_brandongabriel",link:"https://discord.com/"},
+  {id:154,name:"Tatucode",ch:"Discord",grp:"Discord Votantes",ct:"@tatucode",link:"https://discord.com/"},
+  {id:155,name:"Mari",ch:"Discord",grp:"Discord DM",ct:"@_macezario",link:"https://discord.com/"},
+  {id:156,name:"JoãoVictor",ch:"Discord",grp:"Discord DM",ct:"@milk21291",link:"https://discord.com/"},
+  // FORMULÁRIO (17)
+  {id:157,name:"Yolanda Anchieta",ch:"Formulário",grp:"Formulário",ct:"dasilvayolanda03@gmail.com",link:"mailto:dasilvayolanda03@gmail.com"},
+  {id:158,name:"Felipe",ch:"Formulário",grp:"Formulário",ct:"felipesousadacruz20@gmail.com",link:"mailto:felipesousadacruz20@gmail.com"},
+  {id:159,name:"Muriel Christyan Diniz",ch:"Formulário",grp:"Formulário",ct:"murielchristyandinizsoar@gmail.com",link:"mailto:murielchristyandinizsoar@gmail.com"},
+  {id:160,name:"Ariany da Silva Soares",ch:"Formulário",grp:"Formulário",ct:"arianypenh​a40@gmail.com",link:"mailto:arianypenha40@gmail.com"},
+  {id:161,name:"Beatriz",ch:"Formulário",grp:"Formulário",ct:"aiquesaco23@gmail.com",link:"mailto:aiquesaco23@gmail.com"},
+  {id:162,name:"Laura Elis da Silva",ch:"Formulário",grp:"Formulário",ct:"eulauraelis@gmail.com",link:"mailto:eulauraelis@gmail.com"},
+  {id:163,name:"Josiane",ch:"Formulário",grp:"Formulário",ct:"ljosyane7@gmail.com | 21 96618-3219",link:"https://wa.me/5521966183219"},
+  {id:164,name:"Isaac",ch:"Formulário",grp:"Formulário",ct:"isaacsantosfx@gmail.com | 21 98615-1160",link:"https://wa.me/5521986151160"},
+  {id:165,name:"Fernanda Gonçalves",ch:"Formulário",grp:"Formulário",ct:"nan5da5depaula@gmail.com | 21 97394-7306",link:"https://wa.me/5521973947306"},
+  {id:166,name:"Gabriela Vitória",ch:"Formulário",grp:"Formulário",ct:"gabrielavrsantos@gmail.com | 81 97323-5281",link:"https://wa.me/5581973235281"},
+  {id:167,name:"Laysa Vitória Santos",ch:"Formulário",grp:"Formulário",ct:"laysav850@gmail.com | 21 99318-3861",link:"https://wa.me/5521993183861"},
+  {id:168,name:"Pedro Victor",ch:"Formulário",grp:"Formulário",ct:"pedronafuka@gmail.com | 77 99108-7101",link:"https://wa.me/5577991087101"},
+  {id:169,name:"Marcelo Alves da Silva",ch:"Formulário",grp:"Formulário",ct:"silva.marcelo.alves@gmail.com | 21 99397-0248",link:"https://wa.me/5521993970248"},
+  {id:170,name:"Nicolas Miranda",ch:"Formulário",grp:"Formulário",ct:"nicoll.rj17@gmail.com | 21 97269-3074",link:"https://wa.me/5521972693074"},
+  {id:171,name:"Vitor",ch:"Formulário",grp:"Formulário",ct:"vitorhugoceab@gmail.com | 55 21 97637-3223",link:"https://wa.me/5521976373223"},
+  {id:172,name:"Samuel Btaz",ch:"Formulário",grp:"Formulário",ct:"soaressamueldavi@gmail.com | 21 98277-7617",link:"https://wa.me/5521982777617"},
+  {id:173,name:"Samarah Calixto",ch:"Formulário",grp:"Formulário",ct:"samarahcalixto7@gmail.com | 21 99925-6490",link:"https://wa.me/5521999256490"},
+];
+
+// ═══════════════════════════════════════════
+// FEEDBACK STATE (in-memory, exportable)
+// ═══════════════════════════════════════════
+let feedbacks = {};
+try { feedbacks = JSON.parse(localStorage.getItem('lumyf_fb') || '{}'); } catch(e) { feedbacks = {}; }
+function save() { localStorage.setItem('lumyf_fb', JSON.stringify(feedbacks)); }
+function getFb(id) { return feedbacks[id] || {status:'Pendente',replied:false,q1:'',q2:'',q3:'',exp:'',q5:'',q6:'',q7:'',q8:'',q9:'',nps:'',sat:'',obs:''}; }
+
+const channels = ['WhatsApp','LinkedIn','Instagram','Discord','Formulário'];
+const chClass = {WhatsApp:'wa',LinkedIn:'li',Instagram:'ig',Discord:'dc','Formulário':'fm'};
+const statuses = ['Pendente','Contatado','Respondeu','Testou','Feedback completo'];
+const statusClass = {Pendente:'s-pending',Contatado:'s-contacted',Respondeu:'s-replied',Testou:'s-tested','Feedback completo':'s-feedback'};
+let filterCh = 'all';
+let filterSt = 'all';
+
+function init(ch) { return ch.replace(/[^A-Za-zÀ-ÿ]/g,'').slice(0,2).toUpperCase(); }
+function getInitials(n) { return n.replace(/[~</>✌🤘😎()]/g,'').trim().split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+
+function countByChannel(ch) { return ch==='all'?contacts.length:contacts.filter(c=>c.ch===ch).length; }
+function countByStatus(st) {
+  if(st==='all') return contacts.length;
+  return contacts.filter(c=>getFb(c.id).status===st).length;
+}
+function countReplied() { return contacts.filter(c=>getFb(c.id).replied).length; }
+function feedbackProgress(id) {
+  const f=getFb(id);
+  let filled=0, total=9;
+  if(f.q1) filled++; if(f.q2) filled++; if(f.q3) filled++;
+  if(f.exp&&f.exp!=='') filled++; if(f.q5) filled++;
+  if(f.q6) filled++; if(f.q7) filled++; if(f.q8) filled++; if(f.q9) filled++;
+  return Math.round((filled/total)*100);
+}
+
+function renderStats() {
+  const replied = countReplied();
+  const pct = Math.round((replied/contacts.length)*100);
+  document.getElementById('stats').innerHTML = `
+    <div class="st ${filterCh==='all'?'active':''}" onclick="setCh('all')"><div class="st-n" style="color:var(--accent)">${contacts.length}</div><div class="st-l">Total</div></div>
+    <div class="st ${filterCh==='WhatsApp'?'active':''}" onclick="setCh('WhatsApp')"><div class="st-n" style="color:var(--wa)">${countByChannel('WhatsApp')}</div><div class="st-l">WhatsApp</div></div>
+    <div class="st ${filterCh==='LinkedIn'?'active':''}" onclick="setCh('LinkedIn')"><div class="st-n" style="color:var(--li)">${countByChannel('LinkedIn')}</div><div class="st-l">LinkedIn</div></div>
+    <div class="st ${filterCh==='Instagram'?'active':''}" onclick="setCh('Instagram')"><div class="st-n" style="color:var(--ig)">${countByChannel('Instagram')}</div><div class="st-l">Instagram</div></div>
+    <div class="st ${filterCh==='Discord'?'active':''}" onclick="setCh('Discord')"><div class="st-n" style="color:var(--dc)">${countByChannel('Discord')}</div><div class="st-l">Discord</div></div>
+    <div class="st ${filterCh==='Formulário'?'active':''}" onclick="setCh('Formulário')"><div class="st-n" style="color:var(--fm)">${countByChannel('Formulário')}</div><div class="st-l">Formulário</div></div>
+    <div class="st"><div class="st-n" style="color:var(--success)">${replied}</div><div class="st-l">Responderam (${pct}%)</div></div>
+  `;
+}
+
+function renderFilters() {
+  let chHtml = `<button class="pill ${filterCh==='all'?'on':''}" onclick="setCh('all')">Todos</button>`;
+  channels.forEach(ch => { chHtml += `<button class="pill ${filterCh===ch?'on':''}" onclick="setCh('${ch}')"><span class="d" style="background:var(--${chClass[ch]})"></span>${ch}</button>`; });
+  document.getElementById('channelFilters').innerHTML = chHtml;
+
+  let stHtml = `<button class="pill-status ${filterSt==='all'?'on':''}" onclick="setSt('all')">Todos status</button>`;
+  statuses.forEach(st => { stHtml += `<button class="pill-status ${filterSt===st?'on':''}" onclick="setSt('${st}')">${st} (${countByStatus(st)})</button>`; });
+  document.getElementById('statusFilters').innerHTML = stHtml;
+}
+
+function setCh(ch) { filterCh=ch; renderAll(); }
+function setSt(st) { filterSt=st; renderAll(); }
+
+function renderTable() {
+  const q = (document.getElementById('searchBox').value||'').toLowerCase();
+  let filtered = contacts.filter(c => {
+    if(filterCh!=='all' && c.ch!==filterCh) return false;
+    if(filterSt!=='all' && getFb(c.id).status!==filterSt) return false;
+    if(q) {
+      const s = (c.name+c.grp+c.ct+c.ch).toLowerCase();
+      if(!s.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if(filtered.length===0) {
+    document.getElementById('tbody').innerHTML='';
+    document.getElementById('emptyState').style.display='block';
+    return;
+  }
+  document.getElementById('emptyState').style.display='none';
+
+  document.getElementById('tbody').innerHTML = filtered.map(c => {
+    const f = getFb(c.id);
+    const cls = chClass[c.ch];
+    const prog = feedbackProgress(c.id);
+    const progColor = prog===0?'var(--text3)':prog<50?'var(--warn)':prog<100?'var(--accent)':'var(--success)';
+    return `<tr onclick="openModal(${c.id})">
+      <td><div class="name-cell"><div class="av" style="background:var(--${cls}-bg);color:var(--${cls})">${getInitials(c.name)}</div><span class="nm">${c.name}</span></div></td>
+      <td><span class="badge b-${cls}">${c.ch}</span></td>
+      <td><span class="grp-badge">${c.grp}</span></td>
+      <td><span class="ct-mono">${c.ct}</span></td>
+      <td><a class="link-btn" href="${c.link}" target="_blank" onclick="event.stopPropagation()">Abrir →</a></td>
+      <td><span class="status-dot ${statusClass[f.status]||'s-pending'}"></span>${f.status}</td>
+      <td><input type="checkbox" class="check" ${f.replied?'checked':''} onclick="event.stopPropagation();toggleReply(${c.id},this.checked)"></td>
+      <td style="font-size:12px;color:var(--text2)">${f.exp||'—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${f.nps||'—'}</td>
+      <td><div class="progress-bar"><div class="progress-fill" style="width:${prog}%;background:${progColor}"></div></div><span style="font-size:10px;color:var(--text3)">${prog}%</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleReply(id,val) { const f=getFb(id); f.replied=val; if(val&&f.status==='Pendente') f.status='Respondeu'; feedbacks[id]=f; save(); renderAll(); }
+
+let currentId = null;
+function openModal(id) {
+  currentId = id;
+  const c = contacts.find(x=>x.id===id);
+  const f = getFb(id);
+  document.getElementById('modalTitle').textContent = c.name;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="info-bar">
+      <div class="info-item"><strong>Canal:</strong> ${c.ch}</div>
+      <div class="info-item"><strong>Grupo:</strong> ${c.grp}</div>
+      <div class="info-item"><strong>Contato:</strong> ${c.ct}</div>
+      <div class="info-item"><a class="link-btn" href="${c.link}" target="_blank">Abrir conversa →</a></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Status do Funil</label><select id="f_status">${statuses.map(s=>`<option ${f.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label>NPS (0-10)</label><input type="number" id="f_nps" min="0" max="10" value="${f.nps}" placeholder="0-10"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Experiência Geral</label><select id="f_exp"><option value="">Selecione...</option>${['Excelente','Boa','Regular','Ruim','Ainda não testou'].map(o=>`<option ${f.exp===o?'selected':''}>${o}</option>`).join('')}</select></div>
+      <div class="field"><label>Satisfação</label><select id="f_sat"><option value="">Selecione...</option>${['Muito satisfeito','Satisfeito','Neutro','Insatisfeito','Muito insatisfeito'].map(o=>`<option ${f.sat===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    </div>
+    <div class="field"><label>1. Por que quis testar? <small>Motivação</small></label><textarea id="f_q1" placeholder="O que levou essa pessoa a querer testar o Lumyf...">${f.q1}</textarea></div>
+    <div class="field"><label>2. Maior problema de gestão financeira <small>Dor principal</small></label><textarea id="f_q2" placeholder="Qual o maior problema que ela enfrenta com gestão financeira...">${f.q2}</textarea></div>
+    <div class="field"><label>3. Como acha que o Lumyf pode ajudar?</label><textarea id="f_q3" placeholder="Expectativa sobre como o Lumyf resolve o problema...">${f.q3}</textarea></div>
+    <div class="field"><label>5. O que mais gostou?</label><textarea id="f_q5" placeholder="Pontos positivos que destacou...">${f.q5}</textarea></div>
+    <div class="field"><label>6. O que NÃO gostou?</label><textarea id="f_q6" placeholder="Pontos negativos, frustrações...">${f.q6}</textarea></div>
+    <div class="field"><label>7. Encontrou algum erro/bug? 🐛</label><textarea id="f_q7" placeholder="Descreva o erro, em que tela, o que estava fazendo...">${f.q7}</textarea></div>
+    <div class="field"><label>8. O que mudaria?</label><textarea id="f_q8" placeholder="Sugestões de mudança em funcionalidades existentes...">${f.q8}</textarea></div>
+    <div class="field"><label>9. O que implementaria?</label><textarea id="f_q9" placeholder="Sugestões de novas funcionalidades...">${f.q9}</textarea></div>
+    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres...">${f.obs}</textarea></div>
+  `;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('open'); currentId=null; }
+
+function saveFeedback() {
+  if(!currentId) return;
+  feedbacks[currentId] = {
+    status: document.getElementById('f_status').value,
+    replied: getFb(currentId).replied || document.getElementById('f_status').value!=='Pendente',
+    nps: document.getElementById('f_nps').value,
+    exp: document.getElementById('f_exp').value,
+    sat: document.getElementById('f_sat').value,
+    q1: document.getElementById('f_q1').value,
+    q2: document.getElementById('f_q2').value,
+    q3: document.getElementById('f_q3').value,
+    q5: document.getElementById('f_q5').value,
+    q6: document.getElementById('f_q6').value,
+    q7: document.getElementById('f_q7').value,
+    q8: document.getElementById('f_q8').value,
+    q9: document.getElementById('f_q9').value,
+    obs: document.getElementById('f_obs').value,
+  };
+  if(feedbacks[currentId].status!=='Pendente') feedbacks[currentId].replied=true;
+  save();
+  closeModal();
+  renderAll();
+}
+
+function exportCSV() {
+  const headers = ['Nome','Canal','Grupo','Contato','Link','Status','Respondeu','Experiência','NPS','Satisfação','1.Por que quis testar','2.Maior problema','3.Como Lumyf ajuda','5.O que gostou','6.O que não gostou','7.Bugs','8.O que mudaria','9.O que implementaria','Observações'];
+  const rows = contacts.map(c => {
+    const f = getFb(c.id);
+    return [c.name,c.ch,c.grp,c.ct,c.link,f.status,f.replied?'Sim':'Não',f.exp,f.nps,f.sat,f.q1,f.q2,f.q3,f.q5,f.q6,f.q7,f.q8,f.q9,f.obs].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',');
+  });
+  const csv = '\uFEFF'+headers.join(',')+'\n'+rows.join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='feedbacks_lumyf_beta.csv';
+  a.click();
+}
+
+function resetAll() {
+  if(confirm('Tem certeza que deseja resetar TODOS os feedbacks? Isso não pode ser desfeito.')) {
+    feedbacks={};
+    save();
+    renderAll();
+  }
+}
+
+function renderAll() { renderStats(); renderFilters(); renderTable(); }
+renderAll();
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>

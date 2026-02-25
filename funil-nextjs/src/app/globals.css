@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg: #06080c;
+  --color-surface: #0d1117;
+  --color-surface2: #151b24;
+  --color-surface3: #1c2431;
+  --color-border: #21293a;
+  --color-border2: #2d3a4f;
+  --color-text: #e2e8f0;
+  --color-text2: #94a3b8;
+  --color-text3: #64748b;
+  --color-wa: #22c55e;
+  --color-li: #3b82f6;
+  --color-ig: #ec4899;
+  --color-dc: #8b5cf6;
+  --color-fm: #f59e0b;
+  --color-accent: #06b6d4;
+  --color-success: #22c55e;
+  --color-warn: #f59e0b;
+  --color-danger: #ef4444;
+  --font-sans: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-surface); }
+::-webkit-scrollbar-thumb { background: var(--color-border2); border-radius: 3px; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.25s ease;
+}

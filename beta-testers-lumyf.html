@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BETAS LUMYF - Central de Contatos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1a1a24;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --text-muted: #8888a0;
+  --whatsapp: #25D366;
+  --whatsapp-bg: rgba(37,211,102,0.08);
+  --linkedin: #0A66C2;
+  --linkedin-bg: rgba(10,102,194,0.08);
+  --instagram: #E1306C;
+  --instagram-bg: rgba(225,48,108,0.08);
+  --discord: #5865F2;
+  --discord-bg: rgba(88,101,242,0.08);
+  --form: #F5A623;
+  --form-bg: rgba(245,166,35,0.08);
+  --accent: #a78bfa;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.header {
+  padding: 40px 32px 24px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #12121a 0%, var(--bg) 100%);
+}
+
+.header h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.header h1 span { color: var(--accent); }
+
+.header p { color: var(--text-muted); font-size: 14px; }
+
+.stats-bar {
+  display: flex;
+  gap: 12px;
+  padding: 20px 32px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-card {
+  flex-shrink: 0;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  min-width: 120px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stat-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.stat-card.active { border-color: var(--accent); background: rgba(167,139,250,0.06); }
+
+.stat-card .num {
+  font-family: 'Space Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stat-card .label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.stat-whatsapp .num { color: var(--whatsapp); }
+.stat-linkedin .num { color: var(--linkedin); }
+.stat-instagram .num { color: var(--instagram); }
+.stat-discord .num { color: var(--discord); }
+.stat-form .num { color: var(--form); }
+.stat-total .num { color: var(--accent); }
+
+.filters {
+  display: flex;
+  gap: 8px;
+  padding: 16px 32px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+
+.filter-btn .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.search-box {
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  width: 220px;
+  transition: border-color 0.2s;
+}
+
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--text-muted); }
+
+.sections { padding: 8px 32px 60px; }
+
+.section {
+  margin-top: 28px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.section-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.section-header .count {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.group-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin: 20px 0 10px;
+  padding-left: 4px;
+}
+
+.contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 8px;
+}
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: all 0.2s;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.contact-card:hover {
+  border-color: var(--accent);
+  background: var(--surface2);
+  transform: translateX(3px);
+}
+
+.contact-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.contact-info { flex: 1; min-width: 0; }
+
+.contact-name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-detail {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-group-badge {
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+
+.contact-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  transition: transform 0.2s;
+}
+
+.contact-card:hover .contact-action { transform: scale(1.15); }
+
+/* WhatsApp */
+.wa .contact-avatar { background: var(--whatsapp-bg); color: var(--whatsapp); }
+.wa .contact-action { background: var(--whatsapp-bg); color: var(--whatsapp); }
+.wa:hover { border-color: var(--whatsapp); }
+.wa .section-icon { background: var(--whatsapp-bg); color: var(--whatsapp); }
+
+/* LinkedIn */
+.li .contact-avatar { background: var(--linkedin-bg); color: var(--linkedin); }
+.li .contact-action { background: var(--linkedin-bg); color: var(--linkedin); }
+.li:hover { border-color: var(--linkedin); }
+
+/* Instagram */
+.ig .contact-avatar { background: var(--instagram-bg); color: var(--instagram); }
+.ig .contact-action { background: var(--instagram-bg); color: var(--instagram); }
+.ig:hover { border-color: var(--instagram); }
+
+/* Discord */
+.dc .contact-avatar { background: var(--discord-bg); color: var(--discord); }
+.dc .contact-action { background: var(--discord-bg); color: var(--discord); }
+.dc:hover { border-color: var(--discord); }
+
+/* Formulário */
+.fm .contact-avatar { background: var(--form-bg); color: var(--form); }
+.fm .contact-action { background: var(--form-bg); color: var(--form); }
+.fm:hover { border-color: var(--form); }
+
+.hidden { display: none !important; }
+
+@media (max-width: 600px) {
+  .header { padding: 24px 16px 16px; }
+  .stats-bar { padding: 16px; }
+  .filters { padding: 12px 16px; }
+  .sections { padding: 8px 16px 40px; }
+  .contacts-grid { grid-template-columns: 1fr; }
+  .search-box { width: 100%; margin-left: 0; margin-top: 8px; }
+  .filters { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>BETAS <span>LUMYF</span> — Central de Contatos</h1>
+  <p>Clique em qualquer contato para abrir diretamente no canal correspondente</p>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-card stat-total active" onclick="filterBy('all')">
+    <div class="num" id="totalCount">0</div>
+    <div class="label">Total</div>
+  </div>
+  <div class="stat-card stat-whatsapp" onclick="filterBy('whatsapp')">
+    <div class="num" id="waCount">0</div>
+    <div class="label">WhatsApp</div>
+  </div>
+  <div class="stat-card stat-linkedin" onclick="filterBy('linkedin')">
+    <div class="num" id="liCount">0</div>
+    <div class="label">LinkedIn</div>
+  </div>
+  <div class="stat-card stat-instagram" onclick="filterBy('instagram')">
+    <div class="num" id="igCount">0</div>
+    <div class="label">Instagram</div>
+  </div>
+  <div class="stat-card stat-discord" onclick="filterBy('discord')">
+    <div class="num" id="dcCount">0</div>
+    <div class="label">Discord</div>
+  </div>
+  <div class="stat-card stat-form" onclick="filterBy('form')">
+    <div class="num" id="fmCount">0</div>
+    <div class="label">Formulário</div>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" data-filter="all" onclick="filterBy('all')">Todos</button>
+  <button class="filter-btn" data-filter="whatsapp" onclick="filterBy('whatsapp')"><span class="dot" style="background:var(--whatsapp)"></span>WhatsApp</button>
+  <button class="filter-btn" data-filter="linkedin" onclick="filterBy('linkedin')"><span class="dot" style="background:var(--linkedin)"></span>LinkedIn</button>
+  <button class="filter-btn" data-filter="instagram" onclick="filterBy('instagram')"><span class="dot" style="background:var(--instagram)"></span>Instagram</button>
+  <button class="filter-btn" data-filter="discord" onclick="filterBy('discord')"><span class="dot" style="background:var(--discord)"></span>Discord</button>
+  <button class="filter-btn" data-filter="form" onclick="filterBy('form')"><span class="dot" style="background:var(--form)"></span>Formulário</button>
+  <input class="search-box" type="text" placeholder="🔍 Buscar nome ou número..." oninput="searchContacts(this.value)">
+</div>
+
+<div class="sections" id="sections"></div>
+
+<script>
+const data = {
+  whatsapp: [
+    // GRUPO CODECON LADIES
+    { name: "Alice Reis", phone: "5535936180592", group: "Codecon Ladies" },
+    { name: "Contato", phone: "554197829812", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5541881716​87", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5547882156​10", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5548915141​97", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5541925464​14", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5541915685​70", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5521971817313", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5547972381​73", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5547976665​39", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5555969136​27", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5535888012​35", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5541961827​28", group: "Codecon Ladies" },
+    { name: "Leiliane Cavalcante", phone: "5521992182138", group: "Codecon Ladies" },
+    { name: "Contato", phone: "5571933816​53", group: "Codecon Ladies" },
+
+    // GRUPO MULHERES ESTÁCIO
+    { name: "Contato", phone: "5521969306454", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5531970900​01", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5521979407019", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5571868755​71", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5521979858378", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5519994046025", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5573881576​65", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5573881578​65", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5531951565​51", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5547916734​86", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5582884986​33", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5579982457​06", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5521974537619", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5579990721​75", group: "Mulheres Estácio" },
+    { name: "Contato", phone: "5591813141​02", group: "Mulheres Estácio" },
+
+    // GRUPO DESAFIO DA VEZ
+    { name: "Contato", phone: "5562921240​75", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5541985075​30", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5561994413​78", group: "Desafio da Vez" },
+    { name: "Glaucionne Vasconcelos", phone: "5592915520​86", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5519999241135", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5561855054​82", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5567847274​99", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5588946485​72", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5512992401311", group: "Desafio da Vez" },
+    { name: "Tânia", phone: "5511971148627", group: "Desafio da Vez" },
+    { name: "Gilcimara Valentim", phone: "5512996209301", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5549999505​03", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5519993478105", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5537995253​73", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5579984363​65", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5581967653​30", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511987694947", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511993994449", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5524992198631", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5551819932​73", group: "Desafio da Vez" },
+    { name: "Keitlyn Katsuka", phone: "551498770​4780", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5521972388905", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5544993641​98", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511989671460", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511967921094", group: "Desafio da Vez" },
+    { name: "Contato", phone: "4477521991​18", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511968540​74", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5579815229​48", group: "Desafio da Vez" },
+    { name: "Contato", phone: "4079892​5162", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5531121100​49", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511916716294", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511986221167", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5522981430914", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5521996059141", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5511969508999", group: "Desafio da Vez" },
+    { name: "Contato", phone: "5553843524​80", group: "Desafio da Vez" },
+
+    // GRUPO REAL DEV NETWORK
+    { name: "Contato", phone: "5531832462​30", group: "Real Dev Network" },
+    { name: "Contato", phone: "5548995833​69", group: "Real Dev Network" },
+    { name: "Contato", phone: "5532995481​10", group: "Real Dev Network" },
+    { name: "Contato", phone: "5561992871​72", group: "Real Dev Network" },
+    { name: "Contato", phone: "5569922705​82", group: "Real Dev Network" },
+    { name: "Contato", phone: "5511949159058", group: "Real Dev Network" },
+    { name: "Contato", phone: "5549994787​29", group: "Real Dev Network" },
+    { name: "Contato", phone: "244925136481", group: "Real Dev Network" },
+    { name: "Contato", phone: "5511973929903", group: "Real Dev Network" },
+    { name: "Contato", phone: "5518996278558", group: "Real Dev Network" },
+    { name: "Contato", phone: "5582888732​25", group: "Real Dev Network" },
+
+    // GRUPO INICIANTES 1000DEVS
+    { name: "Vinícius Borges", phone: "5562941355​87", group: "Iniciantes 1000Devs" },
+    { name: "Contato", phone: "5571929479​18", group: "Iniciantes 1000Devs" },
+
+    // GRUPO CORVOADA - UNESA
+    { name: "João", phone: "5521982133471", group: "Corvoada UNESA" },
+    { name: "Sis F.a", phone: "5521969150766", group: "Corvoada UNESA" },
+
+    // GRUPO ANALISE E DESENVOLVIMENTO DE SISTEMAS
+    { name: "Acsa Rayane", phone: "5581971851​42", group: "Análise e Dev Sistemas" },
+    { name: "Jhully Emilly", phone: "5567918699​01", group: "Análise e Dev Sistemas" },
+    { name: "Guilherme Freitas", phone: "5595912563​90", group: "Análise e Dev Sistemas" },
+    { name: "Feeh ✌", phone: "5577987631​51", group: "Análise e Dev Sistemas" },
+
+    // GRUPO SQUARD 9 PDA
+    { name: "<L> Guilherme </>", phone: "5574990454​92", group: "Squard 9 PDA" },
+
+    // GRUPO DEVOPS ALUNO
+    { name: "Phillipe Jonson", phone: "5583938349​58", group: "DevOps Aluno" },
+    { name: "Juliene", phone: "5522992143703", group: "DevOps Aluno" },
+    { name: "Flávio 🤘😎", phone: "5584876248​26", group: "DevOps Aluno" },
+
+    // GRUPO DEVOPS ALUNOS 2
+    { name: "Jezebel", phone: "5511957333990", group: "DevOps Alunos 2" },
+
+    // GRUPO GRUPINHO CODECON
+    { name: "Maria Vitoria", phone: "5549990604​95", group: "Grupinho Codecon" },
+    { name: "Mariana", phone: "5541913685​70", group: "Grupinho Codecon" },
+    { name: "Jonathan Schultz", phone: "5527999573375", group: "Grupinho Codecon" },
+    { name: "Marcos", phone: "5547977000​60", group: "Grupinho Codecon" },
+    { name: "Marcucci", phone: "5541848109​77", group: "Grupinho Codecon" },
+    { name: "Ivan Sansao", phone: "5547991882​99", group: "Grupinho Codecon" },
+    { name: "Bruno Sales", phone: "5561814263​20", group: "Grupinho Codecon" },
+    { name: "Felipe Maccari", phone: "5546913445​60", group: "Grupinho Codecon" },
+    { name: "Elcorrea", phone: "5592934018​74", group: "Grupinho Codecon" },
+    { name: "Andre Ovidio", phone: "5547960479​58", group: "Grupinho Codecon" },
+    { name: "Paulo Haus", phone: "5541933006505", group: "Grupinho Codecon" },
+    { name: "Jefferson S. Caires", phone: "5547911580​71", group: "Grupinho Codecon" },
+    { name: "Robson", phone: "5541889517​68", group: "Grupinho Codecon" },
+    { name: "Lucas", phone: "5581883471​71", group: "Grupinho Codecon" },
+    { name: "Roger Correa", phone: "5541992131​02", group: "Grupinho Codecon" },
+    { name: "Tiel", phone: "5511988181616", group: "Grupinho Codecon" },
+    { name: "Saulo", phone: "5547991589​67", group: "Grupinho Codecon" },
+    { name: "Jéssica Isri", phone: "5512988658327", group: "Grupinho Codecon" },
+  ],
+
+  linkedin: [
+    // LINKEDIN ÍRIS
+    { name: "Anderson Nascimento", profile: "Anderson Nascimento", group: "LinkedIn Íris" },
+    { name: "Gabriel Machado", profile: "Gabriel Machado", group: "LinkedIn Íris" },
+    { name: "Jonas Fernandes", profile: "Jonas Fernandes", group: "LinkedIn Íris" },
+    { name: "Raine Rocha", profile: "Raine Rocha", group: "LinkedIn Íris" },
+    { name: "Fernanda Oliveira", profile: "Fernanda Oliveira", group: "LinkedIn Íris" },
+    { name: "Elesfrankly Delmon", profile: "Elesfrankly Delmon", group: "LinkedIn Íris" },
+    { name: "Kayky Santos", profile: "Kayky Santos", group: "LinkedIn Íris" },
+    { name: "Lucas Borges", profile: "Lucas Borges", group: "LinkedIn Íris" },
+    { name: "Rosário Caravela", profile: "Rosário Caravela", group: "LinkedIn Íris" },
+    { name: "Guilherme Barbosa", profile: "Guilherme Barbosa", group: "LinkedIn Íris" },
+    { name: "Felipe Mussi", profile: "Felipe Mussi", group: "LinkedIn Íris" },
+    { name: "Maria Rocha", profile: "Maria Rocha", group: "LinkedIn Íris" },
+    { name: "Wender Gustavo", profile: "Wender Gustavo", group: "LinkedIn Íris" },
+  ],
+
+  instagram: [
+    // INSTAGRAM @CALIXTO.DEV
+    { name: "Davidson William Ferr...", username: "davidson", group: "@calixto.dev" },
+    { name: "Savio Sodré Rosa", username: "saviosodre", group: "@calixto.dev" },
+    { name: "Rodrigo Pereira - PCD", username: "rodrigopereira", group: "@calixto.dev" },
+    { name: "Kelvin Almeida", username: "kelvinalmeida", group: "@calixto.dev" },
+    { name: "Kelven Gomes", username: "kelvengomes", group: "@calixto.dev" },
+    { name: "Mariana Cristina", username: "marianacristina", group: "@calixto.dev" },
+    { name: "Janilton Francisc...", username: "janilton", group: "@calixto.dev" },
+    { name: "Melchisedek Lima", username: "melchisedeklima", group: "@calixto.dev" },
+    { name: "Karolynna Sousa", username: "karolynnasousa", group: "@calixto.dev" },
+    { name: "Soraia Cunha", username: "soraiacunha", group: "@calixto.dev" },
+    { name: "Wellington Lima", username: "wellingtonlima", group: "@calixto.dev" },
+    { name: "Kelvis Xakriabá", username: "kelvisxakriaba", group: "@calixto.dev" },
+    { name: "Caroline dos Sant...", username: "carolinesantos", group: "@calixto.dev" },
+    { name: "Roberta Lau", username: "robertalau", group: "@calixto.dev" },
+    { name: "Douglas Adriano", username: "douglasadriano", group: "@calixto.dev" },
+    { name: "Mayki Gonçalves", username: "maykigoncalves", group: "@calixto.dev" },
+    { name: "Miguel Reis Sant...", username: "miguelreis", group: "@calixto.dev" },
+    { name: "Natan Lucena", username: "natanlucena", group: "@calixto.dev" },
+    { name: "Juliana Gonçalves", username: "julianagoncalves", group: "@calixto.dev" },
+    { name: "Paulo Henrique", username: "paulohenrique", group: "@calixto.dev" },
+    { name: "Jonas Costa", username: "jonascosta", group: "@calixto.dev" },
+    { name: "Marcus Vinícius A...", username: "marcusvinicius", group: "@calixto.dev" },
+    { name: "João Targino", username: "joaotargino", group: "@calixto.dev" },
+  ],
+
+  discord: [
+    // DISCORD - VOTANTES
+    { name: "Dennis Silva (dennisdn07)", username: "dennisdn07", group: "Discord Votantes" },
+    { name: "Júlio César (_jullliao)", username: "_jullliao", group: "Discord Votantes" },
+    { name: "Gabriela Barbosa (gabivitoriax_)", username: "gabivitoriax_", group: "Discord Votantes" },
+    { name: "Keila Silva (keilasilvaa01)", username: "keilasilvaa01", group: "Discord Votantes" },
+    { name: "Allan (allan_cardoso208)", username: "allan_cardoso208", group: "Discord Votantes" },
+    { name: "Diogo Ferreira (diogo.dev7)", username: "diogo.dev7", group: "Discord Votantes" },
+    { name: "Jeferson Alves (_jef.alves7)", username: "_jef.alves7", group: "Discord Votantes" },
+    { name: "Fabiano Gomes (fabianogomes.gom)", username: "fabianogomes.gom", group: "Discord Votantes" },
+    { name: "Brandon Gabriel (_brandongabriel)", username: "_brandongabriel", group: "Discord Votantes" },
+    { name: "Tatucode (tatucode)", username: "tatucode", group: "Discord Votantes" },
+    // DISCORD DMs
+    { name: "Mari (_macezario)", username: "_macezario", group: "Discord DM Leiliane" },
+    { name: "<JoãoVictor/> (milk21291)", username: "milk21291", group: "Discord DM Leiliane" },
+  ],
+
+  form: [
+    { name: "Yolanda Anchieta", email: "dasilvayolanda03@gmail.com", indicator: "Leiliane Cavalcante", phone: "", group: "Formulário" },
+    { name: "Felipe", email: "felipesousadacruz20@gmail.com", indicator: "Minha amiga", phone: "", group: "Formulário" },
+    { name: "Muriel Christyan Diniz", email: "murielchristyandinizsoar@...", indicator: "Pedro Henrique Nogueira", phone: "", group: "Formulário" },
+    { name: "Ariany da Silva Soares C", email: "arianypenh​a40@gmail.com", indicator: "Maria Júlia Bittencourt", phone: "", group: "Formulário" },
+    { name: "Beatriz", email: "aiquesaco23@gmail.com", indicator: "Larissa Marinho", phone: "", group: "Formulário" },
+    { name: "Laura Elis da Silva", email: "eulauraeli​s@gmail.com", indicator: "Emanuelle", phone: "", group: "Formulário" },
+    { name: "Josiane", email: "ljosyane7@gmail.com", indicator: "Emanuele", phone: "21966183219", group: "Formulário" },
+    { name: "Isaac", email: "isaacsantosfx@gmail.com", indicator: "Emanuelle Santana", phone: "21986151160", group: "Formulário" },
+    { name: "Fernanda Gonçalves", email: "nan5da5depaula@gmail.com", indicator: "Emanuelle Santana", phone: "21973947306", group: "Formulário" },
+    { name: "Gabriela Vitória", email: "gabrielavrsantos@gmail.com", indicator: "", phone: "81973235281", group: "Formulário" },
+    { name: "Laysa Vitória Santos", email: "laysav850@gmail.com", indicator: "Maria Júlia Bittencourt", phone: "21993183861", group: "Formulário" },
+    { name: "Pedro Victor", email: "pedronafuka@gmail.com", indicator: "@calixto.dev", phone: "77991087101", group: "Formulário" },
+    { name: "Marcelo Alves da Silva", email: "silva.marcelo.alves@gmail.com", indicator: "Larissa", phone: "21993970248", group: "Formulário" },
+    { name: "Nicolas Miranda", email: "nicoll.rj17@gmail.com", indicator: "Pedro", phone: "21972693074", group: "Formulário" },
+    { name: "Vitor", email: "vitorhugoceab@gmail.com", indicator: "Pedro", phone: "5521976373223", group: "Formulário" },
+    { name: "Samuel Btaz", email: "soaressamueldavi@gmail.com", indicator: "Larissa", phone: "21982777617", group: "Formulário" },
+    { name: "Samarah", email: "samarahcalixto7@gmail.com", indicator: "Tamires", phone: "21999256490", group: "Formulário" },
+  ]
+};
+
+function getInitials(name) {
+  return name.replace(/[~</>✌🤘😎]/g, '').trim().split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
+function cleanPhone(phone) {
+  return phone.replace(/[^\d+]/g, '');
+}
+
+function formatPhone(phone) {
+  const clean = cleanPhone(phone);
+  if (clean.length >= 12) {
+    const cc = clean.slice(0, 2);
+    const ddd = clean.slice(2, 4);
+    const rest = clean.slice(4);
+    return `+${cc} ${ddd} ${rest}`;
+  }
+  return phone;
+}
+
+function render() {
+  const sections = document.getElementById('sections');
+  let html = '';
+
+  // WHATSAPP SECTION
+  const waGroups = {};
+  data.whatsapp.forEach(c => {
+    if (!waGroups[c.group]) waGroups[c.group] = [];
+    waGroups[c.group].push(c);
+  });
+
+  html += `<div class="section" data-channel="whatsapp">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--whatsapp-bg);color:var(--whatsapp)">W</div>
+      <h2 style="color:var(--whatsapp)">WhatsApp</h2>
+      <div class="count">${data.whatsapp.length} contatos</div>
+    </div>`;
+
+  for (const [group, contacts] of Object.entries(waGroups)) {
+    html += `<div class="group-title">${group}</div><div class="contacts-grid">`;
+    contacts.forEach(c => {
+      const clean = cleanPhone(c.phone);
+      const url = `https://wa.me/${clean}`;
+      html += `<a class="contact-card wa" href="${url}" target="_blank" data-name="${c.name.toLowerCase()}" data-detail="${c.phone}" data-channel="whatsapp">
+        <div class="contact-avatar">${getInitials(c.name)}</div>
+        <div class="contact-info">
+          <div class="contact-name">${c.name}</div>
+          <div class="contact-detail">${formatPhone(c.phone)}</div>
+        </div>
+        <div class="contact-group-badge">${group}</div>
+        <div class="contact-action">→</div>
+      </a>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+
+  // LINKEDIN SECTION
+  html += `<div class="section" data-channel="linkedin">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--linkedin-bg);color:var(--linkedin)">in</div>
+      <h2 style="color:var(--linkedin)">LinkedIn</h2>
+      <div class="count">${data.linkedin.length} contatos</div>
+    </div>
+    <div class="contacts-grid">`;
+
+  data.linkedin.forEach(c => {
+    const url = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(c.name)}`;
+    html += `<a class="contact-card li" href="${url}" target="_blank" data-name="${c.name.toLowerCase()}" data-detail="${c.profile}" data-channel="linkedin">
+      <div class="contact-avatar">${getInitials(c.name)}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-detail">${c.group}</div>
+      </div>
+      <div class="contact-group-badge">${c.group}</div>
+      <div class="contact-action">→</div>
+    </a>`;
+  });
+  html += `</div></div>`;
+
+  // INSTAGRAM SECTION
+  html += `<div class="section" data-channel="instagram">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--instagram-bg);color:var(--instagram)">IG</div>
+      <h2 style="color:var(--instagram)">Instagram</h2>
+      <div class="count">${data.instagram.length} contatos</div>
+    </div>
+    <div class="contacts-grid">`;
+
+  data.instagram.forEach(c => {
+    const url = `https://www.instagram.com/direct/t/`;
+    html += `<a class="contact-card ig" href="${url}" target="_blank" data-name="${c.name.toLowerCase()}" data-detail="${c.username}" data-channel="instagram">
+      <div class="contact-avatar">${getInitials(c.name)}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-detail">DM via @calixto.dev</div>
+      </div>
+      <div class="contact-group-badge">${c.group}</div>
+      <div class="contact-action">→</div>
+    </a>`;
+  });
+  html += `</div></div>`;
+
+  // DISCORD SECTION
+  html += `<div class="section" data-channel="discord">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--discord-bg);color:var(--discord)">DC</div>
+      <h2 style="color:var(--discord)">Discord</h2>
+      <div class="count">${data.discord.length} contatos</div>
+    </div>
+    <div class="contacts-grid">`;
+
+  data.discord.forEach(c => {
+    const url = `https://discord.com/`;
+    html += `<a class="contact-card dc" href="${url}" target="_blank" data-name="${c.name.toLowerCase()}" data-detail="${c.username}" data-channel="discord">
+      <div class="contact-avatar">${getInitials(c.name)}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-detail">@${c.username}</div>
+      </div>
+      <div class="contact-group-badge">${c.group}</div>
+      <div class="contact-action">→</div>
+    </a>`;
+  });
+  html += `</div></div>`;
+
+  // FORMULÁRIO SECTION
+  html += `<div class="section" data-channel="form">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--form-bg);color:var(--form)">📋</div>
+      <h2 style="color:var(--form)">Formulário (Email + WhatsApp)</h2>
+      <div class="count">${data.form.length} contatos</div>
+    </div>
+    <div class="contacts-grid">`;
+
+  data.form.forEach(c => {
+    const phone = cleanPhone(c.phone);
+    const hasPhone = phone.length > 5;
+    const url = hasPhone ? `https://wa.me/55${phone.startsWith('55') ? phone.slice(2) : phone}` : `mailto:${c.email}`;
+    const actionLabel = hasPhone ? 'WA' : '✉';
+    html += `<a class="contact-card fm" href="${url}" target="_blank" data-name="${c.name.toLowerCase()}" data-detail="${c.email} ${c.phone}" data-channel="form">
+      <div class="contact-avatar">${getInitials(c.name)}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-detail">${c.email}</div>
+        ${hasPhone ? `<div class="contact-detail" style="color:var(--whatsapp)">${formatPhone(c.phone)}</div>` : ''}
+      </div>
+      <div class="contact-group-badge">Indicação: ${c.indicator || '—'}</div>
+      <div class="contact-action">${actionLabel}</div>
+    </a>`;
+  });
+  html += `</div></div>`;
+
+  sections.innerHTML = html;
+
+  // Update counts
+  const total = data.whatsapp.length + data.linkedin.length + data.instagram.length + data.discord.length + data.form.length;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('waCount').textContent = data.whatsapp.length;
+  document.getElementById('liCount').textContent = data.linkedin.length;
+  document.getElementById('igCount').textContent = data.instagram.length;
+  document.getElementById('dcCount').textContent = data.discord.length;
+  document.getElementById('fmCount').textContent = data.form.length;
+}
+
+function filterBy(channel) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.stat-card').forEach(b => b.classList.remove('active'));
+
+  if (channel === 'all') {
+    document.querySelector('[data-filter="all"]').classList.add('active');
+    document.querySelector('.stat-total').classList.add('active');
+  } else {
+    document.querySelector(`[data-filter="${channel}"]`).classList.add('active');
+    document.querySelector(`.stat-${channel === 'form' ? 'form' : channel}`).classList.add('active');
+  }
+
+  document.querySelectorAll('.section').forEach(s => {
+    if (channel === 'all') {
+      s.classList.remove('hidden');
+    } else {
+      s.classList.toggle('hidden', s.dataset.channel !== channel);
+    }
+  });
+}
+
+function searchContacts(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.contact-card').forEach(card => {
+    if (!q) {
+      card.classList.remove('hidden');
+    } else {
+      const name = card.dataset.name || '';
+      const detail = card.dataset.detail || '';
+      card.classList.toggle('hidden', !name.includes(q) && !detail.includes(q));
+    }
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
